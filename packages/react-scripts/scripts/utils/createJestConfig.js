@@ -16,15 +16,21 @@ module.exports = (resolve, rootDir, isEjecting) => {
   // Use this instead of `paths.testsSetup` to avoid putting
   // an absolute filename into configuration after ejecting.
   const setupTestsMatches = paths.testsSetup.match(/src[/\\]setupTests\.(.+)/);
-  const setupTestsFileExtension =
-    (setupTestsMatches && setupTestsMatches[1]) || 'js';
+  const setupTestsUnitMatches = paths.testsSetupUnit.match(/tests\/unit[/\\]setupTests\.(.+)/);
+
+  const setupTestsFileExtension = fs.existsSync(paths.testsSetup)
+    ? (setupTestsMatches && setupTestsMatches[1])
+    : fs.existsSync(paths.testsSetupUnit)
+      ? (setupTestsUnitMatches && setupTestsUnitMatches[1])
+      : 'js';
+
   const setupTestsFile = fs.existsSync(paths.testsSetup)
     ? `<rootDir>/src/setupTests.${setupTestsFileExtension}`
-    : undefined;
+    : fs.existsSync(paths.testsSetupUnit)
+      ? `<rootDir>/tests/unit/setupTests.${setupTestsFileExtension}`
+      : undefined;
 
   const config = {
-    roots: ['<rootDir>/src'],
-
     collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
 
     setupFiles: [
@@ -37,6 +43,7 @@ module.exports = (resolve, rootDir, isEjecting) => {
     testMatch: [
       '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
       '<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}',
+      '<rootDir>/tests/unit/**/*.{spec,test}.{js,jsx,ts,tsx}',
     ],
     testEnvironment: 'jsdom',
     transform: {
@@ -117,7 +124,7 @@ module.exports = (resolve, rootDir, isEjecting) => {
               chalk.bold('setupFilesAfterEnv') +
               ' in your package.json.\n\n' +
               'Remove it from Jest configuration, and put the initialization code in ' +
-              chalk.bold('src/setupTests.js') +
+              chalk.bold('src/setupTests.js or tests/unit/setupTests.js') +
               '.\nThis file will be loaded automatically.\n'
           )
         );
