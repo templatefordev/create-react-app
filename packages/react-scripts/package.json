@@ -1,6 +1,6 @@
 {
   "name": "@templatefor.dev/react-scripts",
-  "version": "5.0.1",
+  "version": "5.1.0",
   "description": "Templatefor.dev configuration and scripts for Create React App.",
   "repository": {
     "type": "git",
